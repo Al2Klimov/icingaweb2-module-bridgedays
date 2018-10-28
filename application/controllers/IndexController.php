@@ -16,12 +16,24 @@ class IndexController extends Controller
         $this->view->form = $form = new ImportForm();
         $form->handleRequest();
 
-        $this->view->tabs = (new Tabs)->add('import-bridge-days', [
-            'label'     => $this->translate('Import bridge days'),
-            'title'     => $this->translate('Import bridge days'),
-            'icon'      => 'download',
-            'url'       => Url::fromRequest(),
-            'active'    => true
+        switch ($form->getStep()) {
+            case 0:
+                $this->mkTabs('import-bridge-days', 'download', 'Import bridge days', 'Import bridge days');
+                break;
+            case 1:
+                $this->mkTabs('request-holidays', 'upload', 'Request holidays', 'Request holidays');
+                break;
+        }
+    }
+
+    protected function mkTabs($id, $icon, $label, $title)
+    {
+        $this->view->tabs = (new Tabs)->add($id, [
+            'label'  => $label,
+            'title'  => $title,
+            'icon'   => $icon,
+            'url'    => Url::fromRequest(),
+            'active' => true
         ]);
     }
 }
