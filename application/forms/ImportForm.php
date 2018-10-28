@@ -25,7 +25,7 @@ class ImportForm extends Form
 
                     foreach ($hook->getInputs() as $input) {
                         if ($input instanceof Input) {
-                            $inputs[$idPrefix . $input->getId()] = [$input->getName(), $input->getFields()];
+                            $inputs[$idPrefix . $input->getId()] = [$input->getName(), $input];
                         }
                     }
                 }
@@ -48,7 +48,7 @@ class ImportForm extends Form
 
                     foreach ($hook->getOutputs() as $output) {
                         if ($output instanceof Output) {
-                            $outputs[$idPrefix . $output->getId()] = [$output->getName(), $output->getFields()];
+                            $outputs[$idPrefix . $output->getId()] = [$output->getName(), $output];
                         }
                     }
                 }
@@ -84,27 +84,45 @@ class ImportForm extends Form
             'description'  => $this->translate('Bridge days data source'),
             'required'     => true,
             'multiOptions' => $inputs,
+            'autosubmit'   => true
         ]);
 
-        $outputs = [];
-
-        foreach ($this->getOutputs() as $id => list($name, $_)) {
-            $outputs[$id] = $name;
-        }
-
-        if (count($outputs) != 1) {
-            $outputs[''] = '';
-        }
-
-        asort($outputs);
-
-        $this->addElement('select', 'output', [
-            'label'        => $this->translate('Output'),
-            'description'  => $this->translate('Holiday request registry'),
+        $this->addElement('dateTimePicker', 'start', [
+            'label'        => $this->translate('Start date'),
+            'description'  => $this->translate('Query only bridge days not before ...'),
             'required'     => true,
-            'multiOptions' => $outputs,
         ]);
 
-        $this->setSubmitLabel($this->translate('Select'));
+        $this->addElement('dateTimePicker', 'end', [
+            'label'        => $this->translate('End date'),
+            'description'  => $this->translate('Query only bridge days not after ...'),
+            'required'     => true,
+        ]);
+
+        $this->addElement('number', 'maxdays', [
+            'label'        => $this->translate('Bridge days'),
+            'description'  => $this->translate('Request holidays only for periods not longer than ... days'),
+            'required'     => true,
+            'min'          => 0,
+            'value'        => 1,
+        ]);
+
+        if (isset($formData['input'])) {
+            $input = $formData['input'];
+        } else {
+            foreach ($inputs as $input => $_) {
+                break;
+            }
+        }
+
+        $inputs = $this->getInputs();
+
+        if (isset($inputs[$input])) {
+            foreach ($inputs[$input][1]->getFields() as $field) {
+                $this->addElements([$field]);
+            }
+        }
+
+        $this->setSubmitLabel($this->translate('Import'));
     }
 }
