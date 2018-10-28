@@ -298,7 +298,7 @@ class ImportForm extends Form
                 }
 
                 if (empty($selected)) {
-                    $this->addError($this->translate('No bridge days selected'));
+                    $this->addError($this->translate('No bridge days selected (if you HAVE selected some, please just try again)'));
                     return false;
                 }
 
