@@ -4,7 +4,7 @@ SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
 
 RUN apt-get update ;\
 	DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --no-install-suggests -y \
-	apache2 icingaweb2 php7.0-{intl,imagick,mysql} locales ;\
+	apache2 icingaweb2 php7.0-{curl,intl,imagick,mysql} ca-certificates locales ;\
 	apt-get clean ;\
 	rm -vrf /var/lib/apt/lists/* /etc/icingaweb2 ;\
 	a2dissite 000-default
