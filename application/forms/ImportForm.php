@@ -114,7 +114,7 @@ class ImportForm extends Form
                 if (preg_match('/\AX(\d{4})X(\d{2})X(\d{2})X(\d{4})X(\d{2})X(\d{2})\z/', $bridgeday, $matches)) {
                     list($_, $y1, $m1, $d1, $y2, $m2, $d2) = $matches;
 
-                    $this->addElement('checkbox', "X{$y1}X{$m1}X$d1", [
+                    $this->addElement('checkbox', "X{$y1}X{$m1}X{$d1}X{$y2}X{$m2}X{$d2}", [
                         'label'        => sprintf($this->translate('%s to %s'), "$y1-$m1-$d1", "$y2-$m2-$d2"),
                         'description'  => sprintf($this->translate('Request holidays from %s to %s'), "$y1-$m1-$d1", "$y2-$m2-$d2"),
                         'value'        => 1
@@ -274,31 +274,19 @@ class ImportForm extends Form
 
                 return false;
             case 1:
-                $bridgedays = [];
-
-                foreach (str_split($this->getValue('bridgedays'), 22) as $bridgeday) {
-                    $matches = [];
-
-                    if (preg_match('/\AX(\d{4})X(\d{2})X(\d{2})X(\d{4})X(\d{2})X(\d{2})\z/', $bridgeday, $matches)) {
-                        list($_, $y1, $m1, $d1, $y2, $m2, $d2) = $matches;
-
-                        $bridgedays["$y1-$m1-$d1"] = "$y2-$m2-$d2";
-                    }
-                }
-
                 $selected = [];
 
                 foreach ($this->getElements() as $element) {
                     $matches = [];
 
-                    if (preg_match('/\AX(\d{4})X(\d{2})X(\d{2})\z/', $element->getName(), $matches) && $element->isChecked()) {
-                        list($_, $y1, $m1, $d1) = $matches;
-                        $selected["$y1-$m1-$d1"] = $bridgedays["$y1-$m1-$d1"];
+                    if (preg_match('/\AX(\d{4})X(\d{2})X(\d{2})X(\d{4})X(\d{2})X(\d{2})\z/', $element->getName(), $matches) && $element->isChecked()) {
+                        list($_, $y1, $m1, $d1, $y2, $m2, $d2) = $matches;
+                        $selected["$y1-$m1-$d1"] = "$y2-$m2-$d2";
                     }
                 }
 
                 if (empty($selected)) {
-                    $this->addError($this->translate('No bridge days selected (if you HAVE selected some, please just try again)'));
+                    $this->addError($this->translate('No bridge days selected'));
                     return false;
                 }
 
